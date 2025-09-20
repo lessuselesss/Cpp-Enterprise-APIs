@@ -1,0 +1,147 @@
+#pragma once
+
+/// @file utils.hpp
+/// @brief Utility functions for Circular Protocol Enterprise APIs
+
+#include <string>
+#include <future>
+#include <memory>
+#include <variant>
+#include <type_traits>
+
+namespace circular {
+
+/// @brief Task type for asynchronous operations
+///
+/// This provides a convenient alias for std::future to match the async
+/// patterns from the Rust implementation.
+template<typename T>
+using Task = std::future<T>;
+
+/// @brief Result type for operations that can fail
+///
+/// This matches the Rust Result<T, E> type for consistent error handling.
+/// Simple implementation for C++20 compatibility.
+template<typename T, typename E = std::string>
+class Result {
+public:
+    // Factory methods to avoid ambiguity
+    static Result Ok(const T& value) {
+        Result r;
+        r.value_ = value;
+        r.is_ok_ = true;
+        return r;
+    }
+    static Result Ok(T&& value) {
+        Result r;
+        r.value_ = std::move(value);
+        r.is_ok_ = true;
+        return r;
+    }
+    static Result Err(const E& error) {
+        Result r;
+        r.error_ = error;
+        r.is_ok_ = false;
+        return r;
+    }
+    static Result Err(E&& error) {
+        Result r;
+        r.error_ = std::move(error);
+        r.is_ok_ = false;
+        return r;
+    }
+
+    bool has_value() const { return is_ok_; }
+    explicit operator bool() const { return has_value(); }
+
+    const T& value() const {
+        if (!is_ok_) throw std::runtime_error("accessing value on error result");
+        return value_;
+    }
+    T& value() {
+        if (!is_ok_) throw std::runtime_error("accessing value on error result");
+        return value_;
+    }
+
+    const E& error() const {
+        if (is_ok_) throw std::runtime_error("accessing error on ok result");
+        return error_;
+    }
+    E& error() {
+        if (is_ok_) throw std::runtime_error("accessing error on ok result");
+        return error_;
+    }
+
+    const T& operator*() const { return value(); }
+    T& operator*() { return value(); }
+
+private:
+    Result() = default;
+    T value_;
+    E error_;
+    bool is_ok_ = false;
+};
+
+/// @brief Pads a number with a leading zero if it is a single digit
+///
+/// This utility function is typically used for formatting numbers (e.g., hours, minutes)
+/// to ensure a consistent two-digit representation.
+///
+/// @param num An integer to be padded
+/// @return A string representation of the number, padded with a leading zero if 0 <= num < 10
+std::string pad_number(int num);
+
+/// @brief Generates a formatted timestamp string in "YYYY:MM:DD-HH:MM:SS" format
+///
+/// This utility function uses the current UTC time to create a consistent
+/// timestamp string, suitable for use in transaction data or logging.
+///
+/// @return A string containing the formatted timestamp
+std::string get_formatted_timestamp();
+
+/// @brief Cleans and normalizes a hexadecimal string
+///
+/// This utility function performs the following operations:
+/// 1. Removes "0x" or "0X" prefixes
+/// 2. Converts the string to lowercase
+/// 3. Pads the string with a leading '0' if its length is odd
+///
+/// @param hex_str A string representing the hexadecimal string to fix
+/// @return A string containing the cleaned and normalized hexadecimal string
+std::string hex_fix(const std::string& hex_str);
+
+/// @brief Converts a string to its hexadecimal representation
+///
+/// Each byte of the input string is converted into its two-digit uppercase
+/// hexadecimal equivalent.
+///
+/// @param s A string to be converted to hexadecimal
+/// @return A string containing the uppercase hexadecimal representation of the input string
+std::string encode_hex(const std::string& s);
+
+/// @brief Converts a hexadecimal string back to its original string representation
+///
+/// This utility function decodes a hexadecimal string into bytes and then
+/// attempts to convert those bytes into a UTF-8 string. It handles optional
+/// "0x" or "0X" prefixes.
+///
+/// @param hex_str A string representing the hexadecimal string to decode
+/// @return A string containing the decoded string. Returns an empty string if the
+///         input is empty or if decoding/conversion fails
+std::string hex_to_string(const std::string& hex_str);
+
+/// @brief Fetches the Network Access Gateway (NAG) URL for a given network identifier
+///
+/// This asynchronous function queries the network discovery service to retrieve
+/// the appropriate NAG URL. It performs validation on the input and the received
+/// response to ensure a valid URL is returned.
+///
+/// @param network A string representing the network identifier (e.g., "testnet", "mainnet")
+/// @return A Task<Result<std::string, std::string>> which is:
+///         - Ok(String) containing the NAG URL if the request is successful and the response is valid
+///         - Err(String) containing an error message if the network identifier is empty,
+///           the network request fails, the response status is not OK, or the NAG response
+///           indicates an error or contains an invalid URL
+Task<Result<std::string, std::string>> get_nag(const std::string& network);
+
+} // namespace circular
