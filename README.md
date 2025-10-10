@@ -4,163 +4,110 @@ Official Circular Protocol Enterprise APIs for Data Certification - C++ Implemen
 
 ## Features
 
-- Account management and blockchain interaction (`CepAccount`)
-- Certificate creation and submission (`CCertificate`)
+- Account management and blockchain interaction
+- Certificate creation and submission
 - Transaction tracking and verification
 - Secure digital signatures using ECDSA (secp256k1)
-- Asynchronous network operations with modern C++20
-- **100% API compatibility** with Rust reference implementation
+- RFC 6979 compliant deterministic signatures
 
 ## Requirements
 
-- **C++20 compiler** (GCC 11+, Clang 13+, MSVC 2022+)
-- **CMake 3.20+**
-- **OpenSSL** (for SHA256 hashing)
+- C++20 compiler (GCC 11+, Clang 13+, MSVC 2022+)
+- CMake 3.20 or higher
 
 ## Dependencies
 
 Dependencies are automatically managed via CMake FetchContent:
 
-- `nlohmann/json`: JSON serialization and deserialization
-- `cpp-httplib`: Asynchronous HTTP client
-- `libsecp256k1`: ECDSA cryptographic operations
-- `OpenSSL`: SHA-2 hashing algorithm
-- `doctest`: Testing framework
+- `nlohmann/json` for JSON serialization
+- `cpp-httplib` for HTTP client operations
+- `libsecp256k1` for secp256k1 elliptic curve operations
+- `OpenSSL` for SHA-256 hashing
 
-## Quick Start
-
-### 1. Clone and Build
+## Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/lessuselesss/Cpp-Enterprise-APIs.git
 cd Cpp-Enterprise-APIs
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-### 2. Set Environment Variables
-
-```bash
-cp .env.example .env
-# Edit .env with your credentials:
-# CIRCULAR_PRIVATE_KEY="your_64_character_private_key_here"
-# CIRCULAR_ADDRESS="your_account_address_here"
-```
-
-### 3. Run Example
-
-```bash
-export CIRCULAR_PRIVATE_KEY="your_private_key"
-export CIRCULAR_ADDRESS="your_address"
-./build/examples/simple_certificate_submission
-```
-
-## Usage Example
-
-```cpp
-#include <circular/circular_enterprise_apis.hpp>
-
-int main() {
-    // Initialize account
-    circular::CepAccount account;
-    account.open("0x...");
-
-    // Configure network
-    account.set_network("testnet").get();
-    account.update_account().get();
-
-    // Submit certificate
-    account.submit_certificate("Hello, Circular!", "private_key").get();
-
-    // Poll for result
-    auto outcome = account.get_transaction_outcome(
-        account.latest_tx_id, 60, 5).get();
-
-    return 0;
-}
-```
-
-## API Documentation
-
-### `CepAccount` Class
-
-Main class for blockchain interactions:
-
-- `open(address)`: Initialize account with blockchain address
-- `close()`: Clear all account data
-- `set_network(network)`: Configure for specific network ("testnet", "mainnet")
-- `set_blockchain(chain)`: Set blockchain identifier
-- `update_account()`: Fetch latest nonce from network
-- `submit_certificate(data, private_key)`: Submit data certificate
-- `get_transaction(block_id, tx_id)`: Retrieve transaction details
-- `get_transaction_outcome(tx_id, timeout, interval)`: Poll for transaction status
-- `get_last_error()`: Get last error message
-
-### `CCertificate` Class
-
-Certificate management:
-
-- `new()`: Create new certificate
-- `set_data(data)`: Set certificate data (auto-converts to hex)
-- `get_data()`: Get certificate data (auto-converts from hex)
-- `get_json_certificate()`: Serialize to JSON
-- `get_certificate_size()`: Get JSON size in bytes
-- `set_previous_tx_id(tx_id)`: Set previous transaction ID
-- `set_previous_block(block)`: Set previous block ID
-
-## Testing
-
-```bash
-# Run all tests
-cd build && ctest --output-on-failure
-
-# Run specific test suites
-cmake --build build --target test_unit            # Unit tests only
-cmake --build build --target test_integration_only # Integration tests
-cmake --build build --target test_e2e_only        # End-to-end tests
-```
-
-**Note**: Integration and E2E tests require environment variables and network access.
-
-## Building Options
-
-```bash
-# Development build with tests and examples
-cmake -B build -S . \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DCIRCULAR_BUILD_TESTS=ON \
-  -DCIRCULAR_BUILD_EXAMPLES=ON \
-  -DCIRCULAR_ENABLE_ASAN=ON
-
-# Production build
-cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target circular_enterprise_apis
-```
-
-## Installation
+Or install to your system:
 
 ```bash
 cmake --build build --target install
 ```
 
-Or use in your CMake project:
+## Usage Example
 
-```cmake
-find_package(CircularEnterpriseAPIs REQUIRED)
-target_link_libraries(your_target Circular::circular_enterprise_apis)
+See `examples/simple_certificate_submission.cpp` for a basic example of how to use the API to submit a certificate. You can build and run it with:
+
+```bash
+cmake --build build
+./build/examples/simple_certificate_submission
 ```
 
-## Compatibility
+A more detailed example can be found in `examples/` directory.
 
-This C++ implementation provides **100% API compatibility** with the Rust reference implementation:
+## API Documentation
 
-- ✅ Identical method names and signatures
-- ✅ Same JSON wire protocol
-- ✅ Same error codes and messages
-- ✅ Compatible certificate formats
-- ✅ Matching async patterns (translated to C++20 futures)
+### CepAccount Class
 
-Code using the Rust implementation can be easily ported with minimal syntax changes.
+Main class for interacting with the Circular blockchain:
+
+- `CepAccount()` - Constructor to create a new `CepAccount` instance.
+- `bool open(const std::string& address)` - Initializes the account with a specified blockchain address.
+- `void close()` - Clears all sensitive and operational data from the account.
+- `std::future<std::string> set_network(const std::string& network)` - Configures the account to operate on a specific blockchain network.
+- `void set_blockchain(const std::string& chain)` - Explicitly sets the blockchain identifier for the account.
+- `std::future<bool> update_account()` - Fetches the latest nonce for the account from the NAG.
+- `std::future<void> submit_certificate(const std::string& pdata, const std::string& privateKeyHex)` - Creates, signs, and submits a data certificate to the blockchain.
+- `std::future<nlohmann::json> get_transaction(const std::string& blockID, const std::string& transactionID)` - Retrieves transaction details by block and transaction ID.
+- `std::future<nlohmann::json> get_transaction_outcome(const std::string& txID, int timeoutSec, int intervalSec)` - Polls for the final status of a transaction.
+- `std::string get_last_error()` - Retrieves the last error message.
+
+### CCertificate Class
+
+Class for managing certificates:
+
+- `CCertificate()` - Constructor to create a new `CCertificate` instance.
+- `void set_data(const std::string& data)` - Sets the primary data content of the certificate.
+- `std::string get_data()` - Retrieves the primary data content from the certificate.
+- `std::string get_json_certificate()` - Serializes the certificate object into a JSON string.
+- `size_t get_certificate_size()` - Calculates the size of the JSON-serialized certificate in bytes.
+- `void set_previous_tx_id(const std::string& txID)` - Sets the transaction ID of the preceding certificate.
+- `void set_previous_block(const std::string& block)` - Sets the block identifier of the preceding certificate.
+- `std::string get_previous_tx_id()` - Retrieves the transaction ID of the preceding certificate.
+- `std::string get_previous_block()` - Retrieves the block identifier of the preceding certificate.
+
+## Testing
+
+To run the tests, you need to set up a `.env` file in the project root. You can copy the `.env.example` file to get started:
+
+```bash
+cp .env.example .env
+```
+
+Then, edit the `.env` file with your credentials:
+
+```
+CIRCULAR_PRIVATE_KEY="your_64_character_private_key_here"
+CIRCULAR_ADDRESS="your_wallet_address_here"
+```
+
+The private key should be a 64-character (32-byte) hex string, and the address should be a valid Ethereum-style address (40 characters + 0x prefix).
+
+### Running Tests
+
+```bash
+# Build with tests
+cmake -B build -S . -DCIRCULAR_BUILD_TESTS=ON
+cmake --build build
+
+# Run all tests
+cd build && ctest --output-on-failure
+```
 
 ## License
 
@@ -168,8 +115,8 @@ MIT License - see LICENSE file for details
 
 ## Credits
 
-**CIRCULAR GLOBAL LEDGERS, INC.** - USA
+CIRCULAR GLOBAL LEDGERS, INC. - USA
 
-- Original Design: Gianluca De Novi, PhD
-- Rust Reference: Ashley Barr
-- C++ Implementation: Generated with Claude Code
+- Original JS Version: Gianluca De Novi, PhD
+- Go Implementation: Danny De Novi
+- C++ Implementation: Generated with [Claude Code](https://claude.ai/code)
