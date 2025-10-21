@@ -70,73 +70,73 @@ TEST_CASE("Testing hex_fix function") {
     }
 }
 
-TEST_CASE("Testing encode_hex function") {
+TEST_CASE("Testing str_to_hex function") {
     SUBCASE("Basic string conversion") {
-        CHECK(encode_hex("") == "");
-        CHECK(encode_hex("A") == "41");
-        CHECK(encode_hex("Hello") == "48656C6C6F");
+        CHECK(str_to_hex("") == "");
+        CHECK(str_to_hex("A") == "41");
+        CHECK(str_to_hex("Hello") == "48656C6C6F");
     }
 
     SUBCASE("Special characters") {
-        CHECK(encode_hex(" ") == "20");  // Space
-        CHECK(encode_hex("\n") == "0A"); // Newline
-        CHECK(encode_hex("!") == "21");  // Exclamation
+        CHECK(str_to_hex(" ") == "20");  // Space
+        CHECK(str_to_hex("\n") == "0A"); // Newline
+        CHECK(str_to_hex("!") == "21");  // Exclamation
     }
 
     SUBCASE("Unicode characters") {
         // Test with basic ASCII range
-        CHECK(encode_hex("123") == "313233");
-        CHECK(encode_hex("abc") == "616263");
+        CHECK(str_to_hex("123") == "313233");
+        CHECK(str_to_hex("abc") == "616263");
     }
 }
 
-TEST_CASE("Testing hex_to_string function") {
+TEST_CASE("Testing hex_to_str function") {
     SUBCASE("Empty string") {
-        CHECK(hex_to_string("") == "");
+        CHECK(hex_to_str("") == "");
     }
 
     SUBCASE("Remove 0x prefix") {
-        CHECK(hex_to_string("0x48656C6C6F") == "Hello");
-        CHECK(hex_to_string("0X48656C6C6F") == "Hello");
+        CHECK(hex_to_str("0x48656C6C6F") == "Hello");
+        CHECK(hex_to_str("0X48656C6C6F") == "Hello");
     }
 
     SUBCASE("Basic hex to string conversion") {
-        CHECK(hex_to_string("41") == "A");
-        CHECK(hex_to_string("48656C6C6F") == "Hello");
-        CHECK(hex_to_string("313233") == "123");
+        CHECK(hex_to_str("41") == "A");
+        CHECK(hex_to_str("48656C6C6F") == "Hello");
+        CHECK(hex_to_str("313233") == "123");
     }
 
     SUBCASE("Invalid hex strings") {
-        CHECK(hex_to_string("G1") == "");      // Invalid hex character
-        CHECK(hex_to_string("123") == "");     // Odd length
-        CHECK(hex_to_string("ZZ") == "");      // Invalid characters
+        CHECK(hex_to_str("G1") == "");      // Invalid hex character
+        CHECK(hex_to_str("123") == "");     // Odd length
+        CHECK(hex_to_str("ZZ") == "");      // Invalid characters
     }
 
     SUBCASE("Case insensitive") {
-        CHECK(hex_to_string("48656c6c6f") == "Hello"); // lowercase
-        CHECK(hex_to_string("48656C6C6F") == "Hello"); // uppercase
+        CHECK(hex_to_str("48656c6c6f") == "Hello"); // lowercase
+        CHECK(hex_to_str("48656C6C6F") == "Hello"); // uppercase
     }
 }
 
-TEST_CASE("Testing encode_hex and hex_to_string roundtrip") {
+TEST_CASE("Testing str_to_hex and hex_to_str roundtrip") {
     SUBCASE("Roundtrip conversion") {
         std::string original = "Hello, World!";
-        std::string hex = encode_hex(original);
-        std::string decoded = hex_to_string(hex);
+        std::string hex = str_to_hex(original);
+        std::string decoded = hex_to_str(hex);
         CHECK(decoded == original);
     }
 
     SUBCASE("Empty string roundtrip") {
         std::string original = "";
-        std::string hex = encode_hex(original);
-        std::string decoded = hex_to_string(hex);
+        std::string hex = str_to_hex(original);
+        std::string decoded = hex_to_str(hex);
         CHECK(decoded == original);
     }
 
     SUBCASE("Special characters roundtrip") {
         std::string original = "Line 1\nLine 2\tTabbed";
-        std::string hex = encode_hex(original);
-        std::string decoded = hex_to_string(hex);
+        std::string hex = str_to_hex(original);
+        std::string decoded = hex_to_str(hex);
         CHECK(decoded == original);
     }
 }

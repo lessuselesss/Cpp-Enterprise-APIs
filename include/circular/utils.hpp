@@ -113,11 +113,19 @@ std::string hex_fix(const std::string& hex_str);
 /// @brief Converts a string to its hexadecimal representation
 ///
 /// Each byte of the input string is converted into its two-digit uppercase
-/// hexadecimal equivalent.
+/// hexadecimal equivalent. This function matches the StringToHex function
+/// from other language implementations (Go, Java, Node.js, PHP).
+///
+/// Note: Named str_to_hex (not string_to_hex) to avoid collision with OpenSSL's
+/// macro that redefines string_to_hex to OPENSSL_hexstr2buf.
 ///
 /// @param s A string to be converted to hexadecimal
 /// @return A string containing the uppercase hexadecimal representation of the input string
-std::string encode_hex(const std::string& s);
+std::string str_to_hex(const std::string& s);
+
+/// @brief Alias for backward compatibility
+/// @deprecated Use str_to_hex instead
+inline std::string encode_hex(const std::string& s) { return str_to_hex(s); }
 
 /// @brief Converts a hexadecimal string back to its original string representation
 ///
@@ -125,10 +133,13 @@ std::string encode_hex(const std::string& s);
 /// attempts to convert those bytes into a UTF-8 string. It handles optional
 /// "0x" or "0X" prefixes.
 ///
+/// Note: Named hex_to_str (not hex_to_string) to avoid collision with OpenSSL's
+/// macro that redefines hex_to_string to OPENSSL_buf2hexstr.
+///
 /// @param hex_str A string representing the hexadecimal string to decode
 /// @return A string containing the decoded string. Returns an empty string if the
 ///         input is empty or if decoding/conversion fails
-std::string hex_to_string(const std::string& hex_str);
+std::string hex_to_str(const std::string& hex_str);
 
 /// @brief Fetches the Network Access Gateway (NAG) URL for a given network identifier
 ///

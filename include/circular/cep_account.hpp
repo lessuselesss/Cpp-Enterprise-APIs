@@ -71,6 +71,16 @@ public:
     /// @param blockchain_address A string representing the blockchain identifier
     void set_blockchain(const std::string& blockchain_address);
 
+    /// @brief Sets the network node identifier for the account
+    ///
+    /// @param node A string representing the network node identifier
+    void set_network_node(const std::string& node);
+
+    /// @brief Sets the polling interval for transaction outcome checks
+    ///
+    /// @param seconds The interval in seconds between polling attempts
+    void set_interval(std::int32_t seconds);
+
     /// @brief Updates the account's nonce by querying the network
     ///
     /// This asynchronous method sends a request to the network to retrieve

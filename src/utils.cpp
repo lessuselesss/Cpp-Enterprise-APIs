@@ -55,7 +55,7 @@ std::string hex_fix(const std::string& hex_str) {
     return s;
 }
 
-std::string encode_hex(const std::string& s) {
+std::string str_to_hex(const std::string& s) {
     std::ostringstream oss;
     for (unsigned char c : s) {
         oss << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(c);
@@ -63,7 +63,7 @@ std::string encode_hex(const std::string& s) {
     return oss.str();
 }
 
-std::string hex_to_string(const std::string& hex_str) {
+std::string hex_to_str(const std::string& hex_str) {
     if (hex_str.empty()) {
         return "";
     }

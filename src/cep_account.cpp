@@ -170,6 +170,14 @@ void CepAccount::set_blockchain(const std::string& blockchain_address) {
     blockchain = blockchain_address;
 }
 
+void CepAccount::set_network_node(const std::string& node) {
+    network_node = node;
+}
+
+void CepAccount::set_interval(std::int32_t seconds) {
+    interval_sec = seconds;
+}
+
 Task<bool> CepAccount::update_account() {
     return std::async(std::launch::async, [this]() -> bool {
         if (address.empty()) {
@@ -299,9 +307,9 @@ Task<bool> CepAccount::submit_certificate(const std::string& pdata, const std::s
         // Create payload object
         nlohmann::json payload_object = {
             {"Action", "CP_CERTIFICATE"},
-            {"Data", encode_hex(pdata)}
+            {"Data", str_to_hex(pdata)}
         };
-        std::string payload = encode_hex(payload_object.dump());
+        std::string payload = str_to_hex(payload_object.dump());
         std::string timestamp = get_formatted_timestamp();
 
         // Create string to hash
