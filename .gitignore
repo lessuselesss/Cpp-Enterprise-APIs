@@ -1,52 +1,30 @@
-# Build directories
+# Build artifacts
 build/
-cmake-build-*/
-out/
+*.o
+*.a
+*.so
+*.dylib
 
-# Environment files
-.env
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Compiled Object files
-*.o
-*.obj
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Libraries
-*.a
-*.lib
-*.so
-*.dylib
-*.dll
-
-# CMake files
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-*.cmake
-!CMakeLists.txt
-!cmake/*.cmake
-
-# Debug files
-*.pdb
+# Environment
+.env
 *.log
 
-# OS files
+# Repomix analysis files
+*-repomix.xml
+
+# OS
 .DS_Store
 Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp*.xml
-repomix-output.*
