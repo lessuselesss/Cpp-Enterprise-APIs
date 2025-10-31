@@ -7,6 +7,9 @@ namespace circular {
 
 std::unordered_map<std::string, std::string> EnvLoader::env_vars_;
 
+/// @brief Loads environment variables from a .env file
+/// @param filename The path to the .env file to load
+/// @return true if the file was successfully loaded, false otherwise
 bool EnvLoader::load_env_file(const std::string& filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -48,6 +51,9 @@ bool EnvLoader::load_env_file(const std::string& filename) {
     return true;
 }
 
+/// @brief Retrieves an environment variable value
+/// @param key The name of the environment variable to retrieve
+/// @return An optional containing the value if found, or std::nullopt if not found
 std::optional<std::string> EnvLoader::get_env(const std::string& key) {
     // First check loaded .env file
     auto it = env_vars_.find(key);
@@ -64,6 +70,10 @@ std::optional<std::string> EnvLoader::get_env(const std::string& key) {
     return std::nullopt;
 }
 
+/// @brief Retrieves an environment variable value with a default fallback
+/// @param key The name of the environment variable to retrieve
+/// @param default_value The default value to return if the variable is not found
+/// @return The environment variable value if found, otherwise the default value
 std::string EnvLoader::get_env_or(const std::string& key, const std::string& default_value) {
     auto value = get_env(key);
     return value ? *value : default_value;

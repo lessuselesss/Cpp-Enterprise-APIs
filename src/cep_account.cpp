@@ -22,6 +22,8 @@ namespace {
     // Internal helper functions
 
     /// @brief Convert hex string to bytes
+    /// @param hex The hexadecimal string to convert (with or without "0x" prefix)
+    /// @return A vector of bytes representing the hex string
     std::vector<uint8_t> hex_to_bytes(const std::string& hex) {
         std::vector<uint8_t> bytes;
         std::string clean_hex = hex_fix(hex);
@@ -35,6 +37,8 @@ namespace {
     }
 
     /// @brief Convert bytes to hex string
+    /// @param bytes The vector of bytes to convert
+    /// @return A lowercase hexadecimal string representation
     std::string bytes_to_hex(const std::vector<uint8_t>& bytes) {
         std::ostringstream oss;
         for (uint8_t byte : bytes) {
@@ -44,6 +48,8 @@ namespace {
     }
 
     /// @brief Compute SHA256 hash
+    /// @param data The input string to hash
+    /// @return A 32-byte vector containing the SHA256 hash
     std::vector<uint8_t> sha256(const std::string& data) {
         std::vector<uint8_t> hash(SHA256_DIGEST_LENGTH);
         SHA256_CTX sha256_ctx;

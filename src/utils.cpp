@@ -13,6 +13,9 @@
 
 namespace circular {
 
+/// @brief Pads a number with a leading zero if it is a single digit
+/// @param num An integer to be padded
+/// @return A string representation of the number, padded with leading zero if 0 <= num < 10
 std::string pad_number(int num) {
     if (num >= 0 && num < 10) {
         return "0" + std::to_string(num);
@@ -20,6 +23,8 @@ std::string pad_number(int num) {
     return std::to_string(num);
 }
 
+/// @brief Generates a formatted timestamp string in "YYYY:MM:DD-HH:MM:SS" format
+/// @return A string containing the current UTC timestamp
 std::string get_formatted_timestamp() {
     auto now = std::chrono::system_clock::now();
     auto time_t = std::chrono::system_clock::to_time_t(now);
@@ -30,6 +35,9 @@ std::string get_formatted_timestamp() {
     return oss.str();
 }
 
+/// @brief Cleans and normalizes a hexadecimal string
+/// @param hex_str A string representing the hexadecimal value to normalize
+/// @return A normalized lowercase hex string without "0x" prefix and with even length
 std::string hex_fix(const std::string& hex_str) {
     if (hex_str.empty()) {
         return "";
@@ -55,6 +63,9 @@ std::string hex_fix(const std::string& hex_str) {
     return s;
 }
 
+/// @brief Converts a string to its hexadecimal representation
+/// @param s A string to be converted to hexadecimal
+/// @return An uppercase hexadecimal string representing the input bytes
 std::string str_to_hex(const std::string& s) {
     std::ostringstream oss;
     for (unsigned char c : s) {
@@ -63,6 +74,9 @@ std::string str_to_hex(const std::string& s) {
     return oss.str();
 }
 
+/// @brief Converts a hexadecimal string back to its original string representation
+/// @param hex_str A string representing the hexadecimal data to decode
+/// @return The decoded string, or empty string if input is invalid
 std::string hex_to_str(const std::string& hex_str) {
     if (hex_str.empty()) {
         return "";
@@ -134,6 +148,9 @@ namespace {
     };
 }
 
+/// @brief Fetches the Network Access Gateway (NAG) URL for a given network identifier
+/// @param network A string representing the network identifier (e.g., "testnet", "mainnet")
+/// @return A Task that resolves to a Result containing the NAG URL on success, or error message on failure
 Task<Result<std::string, std::string>> get_nag(const std::string& network) {
     return std::async(std::launch::async, [network]() -> Result<std::string, std::string> {
         if (network.empty()) {
