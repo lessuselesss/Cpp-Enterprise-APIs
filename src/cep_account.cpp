@@ -56,6 +56,10 @@ namespace {
     /// @brief Network client for HTTP operations
     class NetworkClient {
     public:
+        /// @brief Performs an async POST request with JSON data
+        /// @param url The HTTPS URL to request
+        /// @param data The JSON data to send in the request body
+        /// @return Task that resolves to Result containing parsed JSON response or error message
         static Task<Result<nlohmann::json, std::string>> post_json(const std::string& url, const nlohmann::json& data) {
             return std::async(std::launch::async, [url, data]() -> Result<nlohmann::json, std::string> {
                 try {
@@ -92,6 +96,11 @@ namespace {
         }
 
     private:
+        /// @brief Parses an HTTPS URL into host and path components
+        /// @param url The full HTTPS URL to parse
+        /// @param host Output parameter for the hostname
+        /// @param path Output parameter for the path (defaults to "/" if not present)
+        /// @return true if parsing succeeded, false if URL format is invalid
         static bool parse_url(const std::string& url, std::string& host, std::string& path) {
             const std::string https_prefix = "https://";
 
@@ -280,7 +289,7 @@ Result<std::string, std::string> CepAccount::sign_data(const std::string& messag
         std::vector<uint8_t> sig_bytes(der_sig, der_sig + der_sig_len);
         std::string sig_hex = bytes_to_hex(sig_bytes);
 
-        // Debug logging (matching Rust implementation)
+        // Debug logging for signature verification
         std::ofstream debug_file("rust_sign_debug.log", std::ios::app);
         if (debug_file.is_open()) {
             debug_file << "C++ SignData Debug:\n";

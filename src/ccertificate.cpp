@@ -25,7 +25,7 @@ std::string CCertificate::get_json_certificate() const {
         nlohmann::json json_cert = to_json();
         return json_cert.dump();
     } catch (const std::exception&) {
-        return ""; // Return empty string on error, matching Rust behavior
+        return ""; // Return empty string on error
     }
 }
 

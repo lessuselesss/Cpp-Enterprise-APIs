@@ -13,37 +13,51 @@ namespace circular {
 
 /// @brief Task type for asynchronous operations
 ///
-/// This provides a convenient alias for std::future to match the async
-/// patterns from the Rust implementation.
+/// This provides a convenient alias for std::future used for async operations
+/// throughout the Circular Protocol API.
 template<typename T>
 using Task = std::future<T>;
 
 /// @brief Result type for operations that can fail
 ///
-/// This matches the Rust Result<T, E> type for consistent error handling.
-/// Simple implementation for C++20 compatibility.
+/// Provides a type-safe way to return either a success value (T) or an error (E).
+/// Use the has_value() method to check for success before accessing the result.
 template<typename T, typename E = std::string>
 class Result {
 public:
-    // Factory methods to avoid ambiguity
+    /// @brief Creates a successful Result containing a value (copy)
+    /// @param value The success value to store
+    /// @return A Result in the Ok state containing the value
     static Result Ok(const T& value) {
         Result r;
         r.value_ = value;
         r.is_ok_ = true;
         return r;
     }
+
+    /// @brief Creates a successful Result containing a value (move)
+    /// @param value The success value to move into the Result
+    /// @return A Result in the Ok state containing the value
     static Result Ok(T&& value) {
         Result r;
         r.value_ = std::move(value);
         r.is_ok_ = true;
         return r;
     }
+
+    /// @brief Creates a failed Result containing an error (copy)
+    /// @param error The error to store
+    /// @return A Result in the Err state containing the error
     static Result Err(const E& error) {
         Result r;
         r.error_ = error;
         r.is_ok_ = false;
         return r;
     }
+
+    /// @brief Creates a failed Result containing an error (move)
+    /// @param error The error to move into the Result
+    /// @return A Result in the Err state containing the error
     static Result Err(E&& error) {
         Result r;
         r.error_ = std::move(error);
@@ -51,28 +65,54 @@ public:
         return r;
     }
 
+    /// @brief Checks if the Result contains a success value
+    /// @return true if the Result is Ok, false if it is Err
     bool has_value() const { return is_ok_; }
+
+    /// @brief Allows Result to be used in boolean contexts
+    /// @return true if the Result is Ok, false if it is Err
     explicit operator bool() const { return has_value(); }
 
+    /// @brief Accesses the success value (const)
+    /// @return A const reference to the contained value
+    /// @throws std::runtime_error if the Result is in the Err state
     const T& value() const {
         if (!is_ok_) throw std::runtime_error("accessing value on error result");
         return value_;
     }
+
+    /// @brief Accesses the success value (mutable)
+    /// @return A mutable reference to the contained value
+    /// @throws std::runtime_error if the Result is in the Err state
     T& value() {
         if (!is_ok_) throw std::runtime_error("accessing value on error result");
         return value_;
     }
 
+    /// @brief Accesses the error (const)
+    /// @return A const reference to the contained error
+    /// @throws std::runtime_error if the Result is in the Ok state
     const E& error() const {
         if (is_ok_) throw std::runtime_error("accessing error on ok result");
         return error_;
     }
+
+    /// @brief Accesses the error (mutable)
+    /// @return A mutable reference to the contained error
+    /// @throws std::runtime_error if the Result is in the Ok state
     E& error() {
         if (is_ok_) throw std::runtime_error("accessing error on ok result");
         return error_;
     }
 
+    /// @brief Dereference operator to access the value (const)
+    /// @return A const reference to the contained value
+    /// @throws std::runtime_error if the Result is in the Err state
     const T& operator*() const { return value(); }
+
+    /// @brief Dereference operator to access the value (mutable)
+    /// @return A mutable reference to the contained value
+    /// @throws std::runtime_error if the Result is in the Err state
     T& operator*() { return value(); }
 
 private:

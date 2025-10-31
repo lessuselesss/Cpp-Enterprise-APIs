@@ -192,11 +192,10 @@ private:
     ///           the private key is invalid, or the signing process fails
     Result<std::string, std::string> sign_data(const std::string& message, const std::string& private_key_hex) const;
 
-    /// @brief Internal asynchronous method to retrieve a transaction by its ID within a block range
+    /// @brief Retrieves a transaction by its ID within a specified block range
     ///
     /// This method constructs and sends a request to the network to fetch transaction
-    /// details. It handles network responses and JSON parsing. This is a private
-    /// helper function used by get_transaction and get_transaction_outcome.
+    /// details within the specified block range. It handles network responses and JSON parsing.
     ///
     /// @param transaction_id A string representing the ID of the transaction
     /// @param start_block The starting block number for the search range

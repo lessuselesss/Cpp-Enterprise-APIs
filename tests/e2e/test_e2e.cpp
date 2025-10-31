@@ -21,7 +21,8 @@ TEST_CASE("E2E test setup") {
         std::string private_key = std::getenv("CIRCULAR_PRIVATE_KEY");
         std::string address = std::getenv("CIRCULAR_ADDRESS");
 
-        CHECK(private_key.length() == 64); // 32 bytes * 2 hex chars
+        // Accept keys with or without "0x" prefix (64 or 66 chars)
+        CHECK((private_key.length() == 64 || private_key.length() == 66));
         CHECK(address.length() >= 40);     // At least 40 hex chars (with or without 0x)
     }
 }

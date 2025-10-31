@@ -37,8 +37,6 @@ public:
 
     /// @brief Sets the data content of the certificate
     ///
-    /// The provided string data is stored directly (matching Rust implementation).
-    ///
     /// @param data A string containing the data to be set
     void set_data(const std::string& data);
 

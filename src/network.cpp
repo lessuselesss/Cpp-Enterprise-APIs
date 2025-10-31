@@ -27,6 +27,9 @@ public:
     }
 
 private:
+    /// @brief Performs a synchronous GET request and parses JSON response
+    /// @param url The HTTPS URL to request
+    /// @return Result containing parsed JSON on success, or error message on failure
     static Result<nlohmann::json, std::string> perform_get_request(const std::string& url) {
         try {
             // Parse URL - assume HTTPS
@@ -58,6 +61,10 @@ private:
         }
     }
 
+    /// @brief Performs a synchronous POST request with JSON data and parses JSON response
+    /// @param url The HTTPS URL to request
+    /// @param data The JSON data to send in the request body
+    /// @return Result containing parsed JSON response on success, or error message on failure
     static Result<nlohmann::json, std::string> perform_post_request(const std::string& url, const nlohmann::json& data) {
         try {
             // Parse URL - assume HTTPS
@@ -91,6 +98,11 @@ private:
         }
     }
 
+    /// @brief Parses an HTTPS URL into host and path components
+    /// @param url The full HTTPS URL to parse
+    /// @param host Output parameter for the hostname
+    /// @param path Output parameter for the path (defaults to "/" if not present)
+    /// @return true if parsing succeeded, false if URL format is invalid
     static bool parse_url(const std::string& url, std::string& host, std::string& path) {
         // Simple URL parsing for HTTPS URLs
         const std::string https_prefix = "https://";

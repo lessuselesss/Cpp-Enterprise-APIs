@@ -23,7 +23,8 @@ TEST_CASE("Integration test setup") {
 
         CHECK(!private_key.empty());
         CHECK(!address.empty());
-        CHECK(private_key.length() == 64); // 32 bytes in hex
+        // Accept keys with or without "0x" prefix (64 or 66 chars)
+        CHECK((private_key.length() == 64 || private_key.length() == 66));
     }
 }
 

@@ -101,25 +101,32 @@ std::string hex_to_str(const std::string& hex_str) {
 namespace {
     /// @brief Thread-safe access to the network URL
     ///
-    /// This matches the Rust implementation's NETWORK_URL with Mutex protection
+    /// Provides mutex-protected access to the network discovery URL
     class NetworkUrlManager {
     public:
+        /// @brief Returns the singleton instance of NetworkUrlManager
+        /// @return Reference to the singleton instance
         static NetworkUrlManager& instance() {
             static NetworkUrlManager instance;
             return instance;
         }
 
+        /// @brief Gets the current network URL
+        /// @return The current network discovery URL (thread-safe)
         std::string get_url() {
             std::lock_guard<std::mutex> lock(mutex_);
             return network_url_;
         }
 
+        /// @brief Sets the network URL
+        /// @param url The new network discovery URL to use (thread-safe)
         void set_url(const std::string& url) {
             std::lock_guard<std::mutex> lock(mutex_);
             network_url_ = url;
         }
 
     private:
+        /// @brief Private constructor for singleton pattern
         NetworkUrlManager() : network_url_(DEFAULT_NETWORK_URL) {}
 
         std::mutex mutex_;
