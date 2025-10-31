@@ -50,36 +50,33 @@ cmake --build build
 
 A more detailed example can be found in `examples/` directory.
 
-## API Documentation
+## API Reference
 
 ### CepAccount Class
+Primary interface for blockchain interaction:
 
-Main class for interacting with the Circular blockchain:
-
-- `CepAccount()` - Constructor to create a new `CepAccount` instance.
-- `bool open(const std::string& address)` - Initializes the account with a specified blockchain address.
-- `void close()` - Clears all sensitive and operational data from the account.
-- `std::future<std::string> set_network(const std::string& network)` - Configures the account to operate on a specific blockchain network.
-- `void set_blockchain(const std::string& chain)` - Explicitly sets the blockchain identifier for the account.
-- `std::future<bool> update_account()` - Fetches the latest nonce for the account from the NAG.
-- `std::future<void> submit_certificate(const std::string& pdata, const std::string& privateKeyHex)` - Creates, signs, and submits a data certificate to the blockchain.
-- `std::future<nlohmann::json> get_transaction(const std::string& blockID, const std::string& transactionID)` - Retrieves transaction details by block and transaction ID.
-- `std::future<nlohmann::json> get_transaction_outcome(const std::string& txID, int timeoutSec, int intervalSec)` - Polls for the final status of a transaction.
-- `std::string get_last_error()` - Retrieves the last error message.
+- **CepAccount()** - Creates a new account instance
+- **open(account_address)** - Initializes account with specified blockchain address
+- **close()** - Clears sensitive operational data
+- **set_network(network)** - Configures network by fetching NAG URL (async, requires `.get()`)
+- **set_blockchain(blockchain_address)** - Explicitly sets blockchain identifier
+- **set_network_node(node)** - Sets network node identifier
+- **set_polling_interval(interval_sec)** - Sets polling interval for transaction checks
+- **update_account()** - Retrieves latest account nonce from NAG (async, requires `.get()`)
+- **submit_certificate(pdata, private_key_hex)** - Creates, signs, and submits data certificate (async, requires `.get()`)
+- **get_transaction(block_id, transaction_id)** - Retrieves transaction details (async, requires `.get()`)
+- **get_transaction_outcome(tx_id, timeout_sec, poll_interval_sec)** - Polls transaction status (async, requires `.get()`)
+- **get_last_error()** - Returns most recent error message
 
 ### CCertificate Class
+Manages certificate data and metadata:
 
-Class for managing certificates:
-
-- `CCertificate()` - Constructor to create a new `CCertificate` instance.
-- `void set_data(const std::string& data)` - Sets the primary data content of the certificate.
-- `std::string get_data()` - Retrieves the primary data content from the certificate.
-- `std::string get_json_certificate()` - Serializes the certificate object into a JSON string.
-- `size_t get_certificate_size()` - Calculates the size of the JSON-serialized certificate in bytes.
-- `void set_previous_tx_id(const std::string& txID)` - Sets the transaction ID of the preceding certificate.
-- `void set_previous_block(const std::string& block)` - Sets the block identifier of the preceding certificate.
-- `std::string get_previous_tx_id()` - Retrieves the transaction ID of the preceding certificate.
-- `std::string get_previous_block()` - Retrieves the block identifier of the preceding certificate.
+- **CCertificate()** - Instantiates certificate object
+- **set_data(data)** / **get_data()** - Manages primary content
+- **get_json_certificate()** - Serializes to JSON format
+- **get_certificate_size()** - Calculates JSON byte size
+- **set_previous_tx_id(tx_id)** / **get_previous_tx_id()** - Manages preceding transaction reference
+- **set_previous_block(block)** / **get_previous_block()** - Manages preceding block identifier
 
 ## Testing
 
