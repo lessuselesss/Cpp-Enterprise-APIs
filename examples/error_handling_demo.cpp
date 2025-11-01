@@ -80,23 +80,26 @@ int main() {
         }
     }
 
-    // Demo 5: Certificate data validation
-    std::cout << "\n5. Testing certificate data validation..." << std::endl;
+    // Demo 5: Certificate data validation and hex encoding
+    std::cout << "\n5. Testing certificate data validation and hex encoding..." << std::endl;
     {
         circular::CCertificate cert;
 
         // Test various data types
+        // Note: Data is hex-encoded internally but get_data() returns the original string
         cert.set_data("Simple string data");
-        std::cout << "✓ String data: " << cert.get_data() << std::endl;
+        std::cout << "✓ String data (decoded): " << cert.get_data() << std::endl;
 
         cert.set_data("Unicode test: 🔒🌐🚀");
-        std::cout << "✓ Unicode data: " << cert.get_data() << std::endl;
+        std::cout << "✓ Unicode data (decoded): " << cert.get_data() << std::endl;
 
         cert.set_data("");
         std::cout << "✓ Empty data: '" << cert.get_data() << "'" << std::endl;
 
+        // The JSON output contains hex-encoded data matching Rust implementation
+        cert.set_data("Hello");
         std::string json_output = cert.get_json_certificate();
-        std::cout << "✓ JSON output: " << json_output << std::endl;
+        std::cout << "✓ JSON output (data is hex-encoded): " << json_output << std::endl;
         std::cout << "✓ Certificate size: " << cert.get_certificate_size() << " bytes" << std::endl;
     }
 

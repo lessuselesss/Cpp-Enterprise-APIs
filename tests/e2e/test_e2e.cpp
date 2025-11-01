@@ -63,17 +63,18 @@ TEST_CASE("Full certificate submission workflow") {
 
         // Submit certificate
         std::string test_data = "E2E test from C++ implementation";
-        account.submit_certificate(test_data, private_key).get();
+        bool submit_success = account.submit_certificate(test_data, private_key).get();
 
-        if (auto error = account.get_last_error()) {
-            if (*error == "certificate submission failed: Invalid Signature" ||
-                *error == "certificate submission failed: Duplicate Nonce" ||
-                *error == "Rejected: Insufficient balance") {
-                std::string msg = "Expected error during submit_certificate: " + *error;
+        if (!submit_success) {
+            auto error = account.get_last_error().value_or("unknown");
+            if (error == "certificate submission failed: Invalid Signature" ||
+                error == "certificate submission failed: Duplicate Nonce" ||
+                error == "Rejected: Insufficient balance") {
+                std::string msg = "Expected error during submit_certificate: " + error;
                 MESSAGE(msg);
                 return; // These are expected for some test scenarios
             } else {
-                std::string msg = "Unexpected error during certificate submission: " + *error;
+                std::string msg = "Unexpected error during certificate submission: " + error;
                 FAIL_CHECK(msg);
             }
         }

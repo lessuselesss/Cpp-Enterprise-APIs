@@ -87,21 +87,29 @@ TEST_CASE("Testing CCertificate JSON serialization") {
 
         // Check that all required fields are present (matching Rust implementation)
         CHECK(json.contains("data"));
+        CHECK(json.contains("previousTxID"));
+        CHECK(json.contains("previousBlock"));
         CHECK(json.contains("version"));
 
         // Check field values match Rust implementation
         CHECK(json["version"] == LIB_VERSION);
+        CHECK(json["previousTxID"] == "prev_tx");
+        CHECK(json["previousBlock"] == "prev_block");
     }
 
-    SUBCASE("Data is stored as-is in JSON (matching Rust)") {
+    SUBCASE("Data is hex-encoded in JSON (matching Rust)") {
         std::string original_data = "Hello";
         cert.set_data(original_data);
 
         std::string json_str = cert.get_json_certificate();
         auto json = nlohmann::json::parse(json_str);
 
-        // Data should be stored as-is, not hex encoded (matching Rust implementation)
-        CHECK(json["data"] == "Hello");
+        // Data should be hex-encoded in JSON (matching Rust implementation)
+        // "Hello" in hex is "48656C6C6F"
+        CHECK(json["data"] == "48656C6C6F");
+
+        // But get_data() should return the original string
+        CHECK(cert.get_data() == "Hello");
     }
 
     SUBCASE("Empty certificate JSON") {
@@ -154,11 +162,13 @@ TEST_CASE("Testing CCertificate JSON field names match Rust") {
     SUBCASE("Field names are correct") {
         // These field names must match the Rust implementation exactly
         CHECK(json.contains("data"));
+        CHECK(json.contains("previousTxID"));
+        CHECK(json.contains("previousBlock"));
         CHECK(json.contains("version"));
     }
 
     SUBCASE("No unexpected fields") {
-        // Should only have these 2 fields (matching Rust implementation)
-        CHECK(json.size() == 2);
+        // Should only have these 4 fields (matching Rust implementation)
+        CHECK(json.size() == 4);
     }
 }

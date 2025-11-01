@@ -37,12 +37,16 @@ public:
 
     /// @brief Sets the data content of the certificate
     ///
+    /// The provided data is automatically hex-encoded before storage.
+    /// This matches the Rust implementation's behavior.
+    ///
     /// @param data A string containing the data to be set
     void set_data(const std::string& data);
 
     /// @brief Retrieves the data content of the certificate
     ///
-    /// Returns the stored data as originally provided.
+    /// The stored hex-encoded data is automatically decoded and returned
+    /// as the original string. This matches the Rust implementation's behavior.
     ///
     /// @return A string containing the decoded data
     std::string get_data() const;

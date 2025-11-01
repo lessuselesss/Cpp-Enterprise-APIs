@@ -16,13 +16,13 @@ CCertificate::CCertificate()
 /// @brief Sets the data content of the certificate
 /// @param data A string containing the data to store in the certificate
 void CCertificate::set_data(const std::string& data) {
-    data_ = data;
+    data_ = str_to_hex(data);
 }
 
 /// @brief Retrieves the certificate's data content
 /// @return The data string stored in the certificate
 std::string CCertificate::get_data() const {
-    return data_;
+    return hex_to_str(data_);
 }
 
 /// @brief Generates a JSON string representation of the certificate
@@ -71,6 +71,8 @@ std::string CCertificate::get_previous_block() const {
 nlohmann::json CCertificate::to_json() const {
     nlohmann::json json_cert;
     json_cert["data"] = data_;
+    json_cert["previousTxID"] = previous_tx_id_;
+    json_cert["previousBlock"] = previous_block_;
     json_cert["version"] = version_;
     return json_cert;
 }

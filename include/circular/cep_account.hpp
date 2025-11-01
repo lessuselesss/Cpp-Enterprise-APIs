@@ -62,8 +62,12 @@ public:
     /// network_node fields. If the NAG URL cannot be retrieved, an error
     /// is set and the method returns false.
     ///
+    /// Note: The Rust implementation returns the NAG URL string. This C++ version
+    /// returns a bool for consistent error handling. The NAG URL is stored in nag_url.
+    ///
     /// @param network A string representing the network identifier (e.g., "testnet")
-    /// @return A Task<bool> that resolves to true if the network was set successfully, false otherwise
+    /// @return A Task<bool> that resolves to true if the network was set successfully,
+    ///         false if an error occurred (check get_last_error() for details)
     Task<bool> set_network(const std::string& network);
 
     /// @brief Sets the blockchain identifier for the account
@@ -100,9 +104,13 @@ public:
     /// the account's latest_tx_id and nonce upon successful submission.
     /// Errors encountered during the process are stored in last_error.
     ///
+    /// Note: The Rust implementation returns void. This C++ version returns
+    /// a bool for immediate success/failure feedback.
+    ///
     /// @param pdata A string containing the payload data for the certificate
     /// @param private_key_hex A string containing the private key in hexadecimal format
-    /// @return A Task<bool> that resolves to true if the submission was successful, false otherwise
+    /// @return A Task<bool> that resolves to true if the submission was successful,
+    ///         false if an error occurred (check get_last_error() for details)
     Task<bool> submit_certificate(const std::string& pdata, const std::string& private_key_hex);
 
     /// @brief Retrieves a transaction from the network by its block ID and transaction ID
