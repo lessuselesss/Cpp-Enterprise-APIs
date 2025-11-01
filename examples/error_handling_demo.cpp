@@ -23,8 +23,8 @@ int main() {
         if (account.open("bb9dbe8b94ae940016e89837574e84e2651f7f10da7809fff0728cc419514370")) {
 
             // Try invalid network
-            bool success = account.set_network("invalid_network").get();
-            if (!success) {
+            std::string nag_url = account.set_network("invalid_network").get();
+            if (nag_url.empty()) {
                 std::cout << "✓ Correctly handled invalid network: "
                           << account.get_last_error().value_or("no error details") << std::endl;
             }
@@ -38,10 +38,9 @@ int main() {
         if (account.open("bb9dbe8b94ae940016e89837574e84e2651f7f10da7809fff0728cc419514370")) {
 
             // Try to submit with invalid private key
-            bool success = account.submit_certificate("test data", "invalid_private_key").get();
-            if (!success) {
-                std::cout << "✓ Correctly rejected invalid private key: "
-                          << account.get_last_error().value_or("no error details") << std::endl;
+            account.submit_certificate("test data", "invalid_private_key").get();
+            if (auto error = account.get_last_error()) {
+                std::cout << "✓ Correctly rejected invalid private key: " << *error << std::endl;
             }
         }
     }
@@ -58,8 +57,9 @@ int main() {
             if (account.open(*address)) {
                 std::cout << "✓ Account opened successfully" << std::endl;
 
-                if (account.set_network("testnet").get()) {
-                    std::cout << "✓ Connected to testnet: " << account.nag_url << std::endl;
+                std::string nag_url = account.set_network("testnet").get();
+                if (!nag_url.empty()) {
+                    std::cout << "✓ Connected to testnet: " << nag_url << std::endl;
 
                     if (account.update_account().get()) {
                         std::cout << "✓ Account updated, nonce: " << account.nonce << std::endl;

@@ -40,8 +40,8 @@ TEST_CASE("Full certificate submission workflow") {
         CHECK(account.open(address));
 
         // Set network
-        bool network_success = account.set_network("testnet").get();
-        if (!network_success) {
+        std::string nag_url = account.set_network("testnet").get();
+        if (nag_url.empty()) {
             std::string error_msg = "Network setup failed: " + account.get_last_error().value_or("unknown");
             MESSAGE(error_msg);
             return;
@@ -63,18 +63,17 @@ TEST_CASE("Full certificate submission workflow") {
 
         // Submit certificate
         std::string test_data = "E2E test from C++ implementation";
-        bool submit_success = account.submit_certificate(test_data, private_key).get();
+        account.submit_certificate(test_data, private_key).get();
 
-        if (!submit_success) {
-            auto error = account.get_last_error().value_or("unknown");
-            if (error == "certificate submission failed: Invalid Signature" ||
-                error == "certificate submission failed: Duplicate Nonce" ||
-                error == "Rejected: Insufficient balance") {
-                std::string msg = "Expected error during submit_certificate: " + error;
+        if (auto error = account.get_last_error()) {
+            if (*error == "certificate submission failed: Invalid Signature" ||
+                *error == "certificate submission failed: Duplicate Nonce" ||
+                *error == "Rejected: Insufficient balance") {
+                std::string msg = "Expected error during submit_certificate: " + *error;
                 MESSAGE(msg);
                 return; // These are expected for some test scenarios
             } else {
-                std::string msg = "Unexpected error during certificate submission: " + error;
+                std::string msg = "Unexpected error during certificate submission: " + *error;
                 FAIL_CHECK(msg);
             }
         }

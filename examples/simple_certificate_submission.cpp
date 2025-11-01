@@ -28,12 +28,12 @@ int main() {
     }
 
     // Set network (e.g., "testnet")
-    bool network_success = account.set_network("testnet").get();
-    if (!network_success) {
+    std::string nag_url = account.set_network("testnet").get();
+    if (nag_url.empty()) {
         std::cerr << "Failed to set network: " << account.get_last_error().value_or("unknown error") << std::endl;
         return 1;
     }
-    std::cout << "Connected to NAG: " << account.nag_url << std::endl;
+    std::cout << "Connected to NAG: " << nag_url << std::endl;
 
     // Update account nonce
     bool update_success = account.update_account().get();
@@ -45,10 +45,10 @@ int main() {
 
     // Create and submit a certificate
     std::string certificate_data = "Hello, Circular Protocol from C++!";
-    bool submit_success = account.submit_certificate(certificate_data, *private_key).get();
+    account.submit_certificate(certificate_data, *private_key).get();
 
-    if (!submit_success) {
-        std::cerr << "Failed to submit certificate: " << account.get_last_error().value_or("unknown error") << std::endl;
+    if (auto error = account.get_last_error()) {
+        std::cerr << "Failed to submit certificate: " << *error << std::endl;
         return 1;
     }
     std::cout << "Certificate submitted. Latest Transaction ID: " << account.latest_tx_id << std::endl;

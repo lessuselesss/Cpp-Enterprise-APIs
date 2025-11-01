@@ -56,8 +56,8 @@ TEST_CASE("Network operations") {
         CepAccount account;
         account.open(address);
 
-        bool network_success = account.set_network("testnet").get();
-        if (network_success) {
+        std::string nag_url = account.set_network("testnet").get();
+        if (!nag_url.empty()) {
             CHECK(!account.nag_url.empty());
             CHECK(account.network_node == "testnet");
         } else {

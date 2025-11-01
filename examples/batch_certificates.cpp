@@ -23,11 +23,12 @@ int main() {
     }
 
     // Connect to testnet
-    if (!account.set_network("testnet").get()) {
+    std::string nag_url = account.set_network("testnet").get();
+    if (nag_url.empty()) {
         std::cerr << "Failed to set network: " << account.get_last_error().value_or("unknown error") << std::endl;
         return 1;
     }
-    std::cout << "Connected to: " << account.nag_url << std::endl;
+    std::cout << "Connected to: " << nag_url << std::endl;
 
     // Update account nonce
     if (!account.update_account().get()) {
@@ -51,11 +52,10 @@ int main() {
     for (size_t i = 0; i < data_batch.size(); ++i) {
         std::cout << "\nSubmitting certificate " << (i + 1) << "/" << data_batch.size() << std::endl;
 
-        bool success = account.submit_certificate(data_batch[i], *private_key).get();
+        account.submit_certificate(data_batch[i], *private_key).get();
 
-        if (!success) {
-            std::cerr << "Failed to submit certificate " << (i + 1) << ": "
-                      << account.get_last_error().value_or("unknown error") << std::endl;
+        if (auto error = account.get_last_error()) {
+            std::cerr << "Failed to submit certificate " << (i + 1) << ": " << *error << std::endl;
             continue;
         }
 

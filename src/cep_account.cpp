@@ -167,30 +167,22 @@ void CepAccount::close() {
     interval_sec = 0;
 }
 
-Task<bool> CepAccount::set_network(const std::string& network) {
-    return std::async(std::launch::async, [this, network]() -> bool {
+Task<std::string> CepAccount::set_network(const std::string& network) {
+    return std::async(std::launch::async, [this, network]() -> std::string {
         auto result = get_nag(network).get();
         if (result.has_value()) {
             nag_url = result.value();
             network_node = network;
-            return true;
+            return nag_url;
         } else {
             last_error_ = result.error();
-            return false;
+            return "";
         }
     });
 }
 
 void CepAccount::set_blockchain(const std::string& blockchain_address) {
     blockchain = blockchain_address;
-}
-
-void CepAccount::set_network_node(const std::string& node) {
-    network_node = node;
-}
-
-void CepAccount::set_interval(std::int32_t seconds) {
-    interval_sec = seconds;
 }
 
 Task<bool> CepAccount::update_account() {
@@ -312,11 +304,11 @@ Result<std::string, std::string> CepAccount::sign_data(const std::string& messag
     }
 }
 
-Task<bool> CepAccount::submit_certificate(const std::string& pdata, const std::string& private_key_hex) {
-    return std::async(std::launch::async, [this, pdata, private_key_hex]() -> bool {
+Task<void> CepAccount::submit_certificate(const std::string& pdata, const std::string& private_key_hex) {
+    return std::async(std::launch::async, [this, pdata, private_key_hex]() -> void {
         if (address.empty()) {
             last_error_ = "Account is not open";
-            return false;
+            return;
         }
 
         // Create payload object
@@ -338,7 +330,7 @@ Task<bool> CepAccount::submit_certificate(const std::string& pdata, const std::s
         auto signature_result = sign_data(id, private_key_hex);
         if (!signature_result.has_value()) {
             last_error_ = "failed to sign data: " + signature_result.error();
-            return false;
+            return;
         }
 
         // Create request data
@@ -361,7 +353,7 @@ Task<bool> CepAccount::submit_certificate(const std::string& pdata, const std::s
 
         if (!result.has_value()) {
             last_error_ = result.error();
-            return false;
+            return;
         }
 
         auto data = result.value();
@@ -370,17 +362,14 @@ Task<bool> CepAccount::submit_certificate(const std::string& pdata, const std::s
             if (result_code == 200) {
                 latest_tx_id = id;
                 nonce += 1;
-                return true;
             } else {
                 if (data.contains("Response") && data["Response"].is_string()) {
                     last_error_ = "certificate submission failed: " + data["Response"].get<std::string>();
                 } else {
                     last_error_ = "certificate submission failed with non-200 result code";
                 }
-                return false;
             }
         }
-        return false;
     });
 }
 

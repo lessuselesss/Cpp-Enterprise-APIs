@@ -59,31 +59,17 @@ public:
     ///
     /// This asynchronous method uses the provided network identifier to query
     /// the network discovery service and update the account's nag_url and
-    /// network_node fields. If the NAG URL cannot be retrieved, an error
-    /// is set and the method returns false.
-    ///
-    /// Note: The Rust implementation returns the NAG URL string. This C++ version
-    /// returns a bool for consistent error handling. The NAG URL is stored in nag_url.
+    /// network_node fields.
     ///
     /// @param network A string representing the network identifier (e.g., "testnet")
-    /// @return A Task<bool> that resolves to true if the network was set successfully,
-    ///         false if an error occurred (check get_last_error() for details)
-    Task<bool> set_network(const std::string& network);
+    /// @return A Task<std::string> that resolves to the NAG URL on success,
+    ///         or an empty string on error (check get_last_error() for details)
+    Task<std::string> set_network(const std::string& network);
 
     /// @brief Sets the blockchain identifier for the account
     ///
     /// @param blockchain_address A string representing the blockchain identifier
     void set_blockchain(const std::string& blockchain_address);
-
-    /// @brief Sets the network node identifier for the account
-    ///
-    /// @param node A string representing the network node identifier
-    void set_network_node(const std::string& node);
-
-    /// @brief Sets the polling interval for transaction outcome checks
-    ///
-    /// @param seconds The interval in seconds between polling attempts
-    void set_interval(std::int32_t seconds);
 
     /// @brief Updates the account's nonce by querying the network
     ///
@@ -104,14 +90,11 @@ public:
     /// the account's latest_tx_id and nonce upon successful submission.
     /// Errors encountered during the process are stored in last_error.
     ///
-    /// Note: The Rust implementation returns void. This C++ version returns
-    /// a bool for immediate success/failure feedback.
-    ///
     /// @param pdata A string containing the payload data for the certificate
     /// @param private_key_hex A string containing the private key in hexadecimal format
-    /// @return A Task<bool> that resolves to true if the submission was successful,
-    ///         false if an error occurred (check get_last_error() for details)
-    Task<bool> submit_certificate(const std::string& pdata, const std::string& private_key_hex);
+    /// @return A Task<void> that completes when the submission finishes
+    ///         (check get_last_error() to see if an error occurred)
+    Task<void> submit_certificate(const std::string& pdata, const std::string& private_key_hex);
 
     /// @brief Retrieves a transaction from the network by its block ID and transaction ID
     ///

@@ -48,12 +48,12 @@ To where it bent in the undergrowth;
     std::cout << "Account opened successfully for address: " << account.address << std::endl;
 
     // Set the network (e.g., "testnet")
-    bool network_success = account.set_network("testnet").get();
-    if (!network_success) {
+    std::string nag_url = account.set_network("testnet").get();
+    if (nag_url.empty()) {
         std::cerr << "Failed to set network: " << account.get_last_error().value_or("unknown error") << std::endl;
         return 1;
     }
-    std::cout << "Network set. NAG URL: " << account.nag_url << std::endl;
+    std::cout << "Network set. NAG URL: " << nag_url << std::endl;
 
     // Update the account to fetch the latest nonce
     bool update_success = account.update_account().get();

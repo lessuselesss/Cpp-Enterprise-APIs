@@ -37,7 +37,8 @@ int main() {
     }
 
     // Connect to testnet
-    if (!account.set_network("testnet").get()) {
+    std::string nag_url = account.set_network("testnet").get();
+    if (nag_url.empty()) {
         std::cerr << "Failed to connect to testnet" << std::endl;
         return 1;
     }
@@ -80,11 +81,10 @@ int main() {
 
     // Submit the certificate
     std::cout << "\nSubmitting certificate with metadata..." << std::endl;
-    bool success = account.submit_certificate(json_string, *private_key).get();
+    account.submit_certificate(json_string, *private_key).get();
 
-    if (!success) {
-        std::cerr << "Failed to submit certificate: "
-                  << account.get_last_error().value_or("unknown error") << std::endl;
+    if (auto error = account.get_last_error()) {
+        std::cerr << "Failed to submit certificate: " << *error << std::endl;
         return 1;
     }
 
